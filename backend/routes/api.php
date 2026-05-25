@@ -12,15 +12,25 @@ use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/analytics', [AnalyticsController::class, 'index']);
+use App\Http\Controllers\AuthController;
 
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/suppliers', [SupplierController::class, 'index']);
-Route::get('/products', [ProductController::class, 'index']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::apiResource('raw-material-logs', RawMaterialLogController::class);
-Route::apiResource('delivery-truck-logs', DeliveryTruckLogController::class);
-Route::apiResource('pest-control-logs', PestControlLogController::class);
-Route::apiResource('oil-temperature-logs', OilTemperatureLogController::class);
-Route::apiResource('cleaning-logs', CleaningLogController::class);
-Route::apiResource('stock-management-logs', StockManagementLogController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'user']);
+
+    Route::get('/analytics', [AnalyticsController::class, 'index']);
+
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/suppliers', [SupplierController::class, 'index']);
+    Route::get('/products', [ProductController::class, 'index']);
+
+    Route::apiResource('raw-material-logs', RawMaterialLogController::class);
+    Route::apiResource('delivery-truck-logs', DeliveryTruckLogController::class);
+    Route::apiResource('pest-control-logs', PestControlLogController::class);
+    Route::apiResource('oil-temperature-logs', OilTemperatureLogController::class);
+    Route::apiResource('cleaning-logs', CleaningLogController::class);
+    Route::apiResource('stock-management-logs', StockManagementLogController::class);
+});

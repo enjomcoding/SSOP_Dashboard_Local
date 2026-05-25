@@ -12,7 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('full_name', 100);
             $table->string('initials', 10);
-            $table->string('role', 50);
+            $table->string('username')->unique();
+            $table->string('password');
+            $table->string('role', 50)->default('OPERATOR');
+            $table->rememberToken();
             $table->timestamps();
         });
     }

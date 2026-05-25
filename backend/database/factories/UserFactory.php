@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<User>
@@ -29,6 +31,9 @@ class UserFactory extends Factory
             'full_name' => $fullName,
             'initials' => $this->initialsFromName($fullName),
             'role' => fake()->randomElement(self::ROLES),
+            'username' => strtolower(str_replace(' ', '.', $fullName)),
+            'password' => Hash::make('password'),
+            'remember_token' => Str::random(10),
         ];
     }
 

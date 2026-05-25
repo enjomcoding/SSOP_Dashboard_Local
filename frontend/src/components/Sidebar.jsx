@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
   ClipboardList,
   Droplets,
@@ -8,6 +9,7 @@ import {
   Truck,
   Bug,
   Warehouse,
+  LogOut,
 } from 'lucide-react';
 import { resourceMeta } from '../config/resourceFields';
 
@@ -30,8 +32,16 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white">
+    <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white print:hidden">
       <div className="border-b border-gray-200 px-6 py-5">
         <h1 className="text-base font-bold leading-tight text-emerald-700">Ilocos Food Products</h1>
         <p className="mt-1 text-xs leading-snug text-gray-500">
@@ -57,8 +67,18 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <footer className="border-t border-gray-200 px-6 py-4">
-        <p className="text-xs text-gray-400">Taleb, Bantay, Ilocos Sur</p>
+      <footer className="border-t border-gray-200 p-4">
+        <div className="mb-4 px-2">
+          <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
+          <p className="text-xs text-gray-500">@{user?.username}</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+        >
+          <LogOut size={18} />
+          Log Out
+        </button>
       </footer>
     </aside>
   );

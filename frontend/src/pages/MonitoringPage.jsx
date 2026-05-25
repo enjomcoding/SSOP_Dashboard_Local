@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, FileText, Printer } from 'lucide-react';
 import DataTable from '../components/DataTable';
 import FormInput from '../components/FormInput';
 import Modal from '../components/Modal';
@@ -10,6 +10,7 @@ import { resourceColumns, resourceFields, resourceMeta } from '../config/resourc
 import { useFetchLogs } from '../hooks/useFetchLogs';
 import { useReferenceData } from '../hooks/useReferenceData';
 import { useSubmitLog } from '../hooks/useSubmitLog';
+import { exportToCsv } from '../utils/csvExport';
 
 const emptyForm = (fields) =>
   fields.reduce((acc, field) => {
@@ -123,8 +124,33 @@ export default function MonitoringPage({ resourceKey }) {
     }
   };
 
-  const headerAction = useMemo(
-    () => (
+  const handleExportCsv = () => {
+    const filename = `${meta.title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+    exportToCsv(records, columns, filename);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const headerAction = (
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={handleExportCsv}
+        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+        <FileText size={16} />
+        Export CSV
+      </button>
+      <button
+        type="button"
+        onClick={handlePrint}
+        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+        <Printer size={16} />
+        Print Report
+      </button>
       <button
         type="button"
         onClick={openCreate}
@@ -133,8 +159,7 @@ export default function MonitoringPage({ resourceKey }) {
         <Plus size={16} />
         New Record
       </button>
-    ),
-    []
+    </div>
   );
 
   return (
@@ -145,6 +170,18 @@ export default function MonitoringPage({ resourceKey }) {
         action={headerAction}
       />
 
+      <div className="hidden print:mb-8 print:block">
+        <div className="mb-4 text-center">
+          <h1 className="text-xl font-bold uppercase">Ilocos Food Products</h1>
+          <p className="text-sm">Sanitation Standard Operating Procedures (SSOP)</p>
+          <p className="text-sm">Location: Taleb, Bantay, Ilocos Sur</p>
+        </div>
+        <div className="flex justify-between border-b border-black pb-2 text-sm font-medium">
+          <p>Document: {meta.title}</p>
+          <p>Date Printed: {new Date().toLocaleString()}</p>
+        </div>
+      </div>
+
       {loading ? (
         <TableSkeleton cols={columns.length + 1} />
       ) : (
@@ -152,6 +189,33 @@ export default function MonitoringPage({ resourceKey }) {
       )}
 
       <PaginationControls pagination={pagination} onPageChange={setPage} />
+
+      <div className="hidden print:mt-12 print:block">
+        <table className="w-full border-collapse border border-black text-sm">
+          <tbody>
+            <tr>
+              <td className="w-1/2 border border-black p-4 align-top">
+                <p className="mb-8 font-medium">Prepared & Reviewed by:</p>
+                <div className="mt-8 w-3/4 border-t border-black pt-1">
+                  <p>Name / Signature</p>
+                </div>
+                <div className="mt-8 w-3/4 border-t border-black pt-1">
+                  <p>Position</p>
+                </div>
+              </td>
+              <td className="w-1/2 border border-black p-4 align-top">
+                <p className="mb-8 font-medium">Approved by:</p>
+                <div className="mt-8 w-3/4 border-t border-black pt-1">
+                  <p>Name / Signature</p>
+                </div>
+                <div className="mt-8 w-3/4 border-t border-black pt-1">
+                  <p>Position</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <Modal
         isOpen={modalOpen}

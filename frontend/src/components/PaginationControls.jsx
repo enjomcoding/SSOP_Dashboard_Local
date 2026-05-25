@@ -4,7 +4,7 @@ export default function PaginationControls({ pagination, onPageChange }) {
   }
 
   return (
-    <div className="mt-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
+    <div className="mt-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 print:hidden">
       <p className="text-sm text-gray-600">
         Page {pagination.current_page} of {pagination.last_page} ({pagination.total} records)
       </p>

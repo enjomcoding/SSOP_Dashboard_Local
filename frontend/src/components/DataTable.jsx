@@ -19,7 +19,7 @@ export default function DataTable({ columns, data, onEdit, onDelete }) {
                 {col.label}
               </th>
             ))}
-            <th className="px-4 py-3 text-right font-medium text-gray-600">Actions</th>
+            <th className="px-4 py-3 text-right font-medium text-gray-600 print:hidden">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
@@ -30,7 +30,7 @@ export default function DataTable({ columns, data, onEdit, onDelete }) {
                   {col.render ? col.render(row) : row[col.key] ?? '—'}
                 </td>
               ))}
-              <td className="px-4 py-3">
+              <td className="px-4 py-3 print:hidden">
                 <div className="flex justify-end gap-2">
                   <button
                     type="button"
