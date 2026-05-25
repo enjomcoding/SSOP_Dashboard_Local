@@ -14,6 +14,7 @@ class RawMaterialLogRequest extends FormRequest
 
     public function rules(): array
     {
+        return [
             'supplier' => ['required', 'string', 'max:150'],
             'agreed_scheduled_date' => ['nullable', 'date'],
             'receiving_date' => ['required', 'date'],
