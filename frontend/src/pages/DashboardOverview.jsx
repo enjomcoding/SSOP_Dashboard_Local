@@ -40,7 +40,7 @@ export default function DashboardOverview() {
   if (loading) {
     return (
       <>
-        <TopHeader title="Analytics Overview" subtitle="Food safety monitoring at a glance" />
+        <TopHeader title="Analytics Overview" subtitle="Sanitation Standard Operating Procedures" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-24 animate-pulse rounded-lg bg-gray-200" />
@@ -57,7 +57,7 @@ export default function DashboardOverview() {
   if (error || !data) {
     return (
       <>
-        <TopHeader title="Analytics Overview" subtitle="Food safety monitoring at a glance" />
+        <TopHeader title="Analytics Overview" subtitle="Sanitation Standard Operating Procedures" />
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-700">
           Unable to load analytics. Ensure the API server is running.
         </div>
@@ -71,7 +71,7 @@ export default function DashboardOverview() {
     <>
       <TopHeader
         title="Analytics Overview"
-        subtitle="Food safety monitoring at a glance"
+        subtitle="Sanitation Standard Operating Procedures"
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

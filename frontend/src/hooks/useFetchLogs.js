@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchLogs } from '../services/endpoints';
+import { normalizePaginatedResponse } from '../utils/pagination';
 
 export function useFetchLogs(resourceKey, page = 1) {
-  const [data, setData] = useState(null);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -11,10 +12,10 @@ export function useFetchLogs(resourceKey, page = 1) {
     setError(null);
     try {
       const response = await fetchLogs(resourceKey, page);
-      setData(response.data);
+      setPagination(normalizePaginatedResponse(response.data));
     } catch (err) {
       setError(err);
-      setData(null);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -24,5 +25,11 @@ export function useFetchLogs(resourceKey, page = 1) {
     load();
   }, [load]);
 
-  return { data, loading, error, reload: load };
+  return {
+    records: pagination?.records ?? [],
+    pagination,
+    loading,
+    error,
+    reload: load,
+  };
 }

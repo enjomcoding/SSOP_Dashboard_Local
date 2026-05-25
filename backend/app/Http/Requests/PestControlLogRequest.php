@@ -15,13 +15,16 @@ class PestControlLogRequest extends FormRequest
     {
         return [
             'inspection_date' => ['required', 'date'],
-            'inspector_name' => ['required', 'string', 'max:100'],
+            'inspector_name' => ['required', 'string', 'max:255'],
             'inspection_area' => ['required', 'string', 'max:150'],
             'pest_activity_observed' => ['sometimes', 'boolean'],
             'type_of_pest' => ['nullable', 'string', 'max:100'],
             'corrective_action_taken' => ['nullable', 'string'],
-            'inspector_initials' => ['required', 'string', 'max:10'],
-            'verified_by_qa' => ['nullable', 'string', 'max:100'],
+            'verified_by_qa_name' => ['nullable', 'string', 'max:255'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
     }
 }

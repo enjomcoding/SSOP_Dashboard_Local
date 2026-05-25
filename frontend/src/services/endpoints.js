@@ -27,3 +27,9 @@ export const deleteLog = (resourceKey, id) =>
   api.delete(`/${resources[resourceKey]}/${id}`);
 
 export const fetchAnalytics = () => api.get('/analytics');
+
+export const fetchUsers = () => api.get('/users');
+
+export const fetchSuppliers = () => api.get('/suppliers');
+
+export const fetchProducts = () => api.get('/products');

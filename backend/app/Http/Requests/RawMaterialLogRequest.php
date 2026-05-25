@@ -14,21 +14,19 @@ class RawMaterialLogRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'supplier_name' => ['required', 'string', 'max:150'],
+            'supplier' => ['required', 'string', 'max:150'],
             'agreed_scheduled_date' => ['nullable', 'date'],
             'receiving_date' => ['required', 'date'],
             'time_received' => ['required', 'date_format:H:i:s'],
             'delivery_vehicle_id' => ['nullable', 'string', 'max:80'],
-            'qc_inspector' => ['required', 'string', 'max:100'],
+            'qc_inspector_name' => ['required', 'string', 'max:255'],
             'raw_material' => ['required', 'string', 'max:150'],
             'packaging_condition' => ['required', Rule::in(['GOOD', 'DAMAGED'])],
             'moisture_content_or_expiry' => ['nullable', 'string', 'max:150'],
             'within_specs' => ['sometimes', 'boolean'],
             'quantity' => ['required', 'numeric', 'min:0'],
             'status' => ['required', Rule::in(['ACCEPTED', 'REJECTED'])],
-            'inspector_initials' => ['required', 'string', 'max:10'],
-            'received_by' => ['required', 'string', 'max:100'],
+            'received_by_name' => ['required', 'string', 'max:255'],
         ];
     }
 

@@ -33,8 +33,10 @@ export default function Sidebar() {
   return (
     <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white">
       <div className="border-b border-gray-200 px-6 py-5">
-        <h1 className="text-lg font-bold text-emerald-700">FSQA Monitor</h1>
-        <p className="text-xs text-gray-500">Food Safety & Quality</p>
+        <h1 className="text-base font-bold leading-tight text-emerald-700">Ilocos Food Products</h1>
+        <p className="mt-1 text-xs leading-snug text-gray-500">
+          Sanitation Standard Operating Procedures
+        </p>
       </div>
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map(({ to, label, icon: Icon }) => (
@@ -55,6 +57,9 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+      <footer className="border-t border-gray-200 px-6 py-4">
+        <p className="text-xs text-gray-400">Taleb, Bantay, Ilocos Sur</p>
+      </footer>
     </aside>
   );
 }

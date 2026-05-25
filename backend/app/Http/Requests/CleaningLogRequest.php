@@ -20,8 +20,8 @@ class CleaningLogRequest extends FormRequest
             'standard_met' => ['sometimes', 'boolean'],
             'action_taken' => ['nullable', 'string'],
             'sanitizer_used' => ['nullable', 'string', 'max:100'],
-            'performed_by' => ['required', 'string', 'max:100'],
-            'checked_by' => ['nullable', 'string', 'max:100'],
+            'performed_by_name' => ['required', 'string', 'max:255'],
+            'checked_by_name' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -30,5 +30,6 @@ class CleaningLogRequest extends FormRequest
         if ($this->has('log_time') && preg_match('/^\d{2}:\d{2}$/', $this->log_time)) {
             $this->merge(['log_time' => $this->log_time . ':00']);
         }
+
     }
 }

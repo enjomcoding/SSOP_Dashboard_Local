@@ -33,14 +33,20 @@ export default function FormInput({ label, name, type = 'text', value, onChange,
         {label}
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>
-      {type === 'select' ? (
+      {type === 'select' || type === 'referenceSelect' ? (
         <select id={inputId} name={name} value={value ?? ''} onChange={onChange} required={required} className={baseClass}>
           <option value="">Select...</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
+          {type === 'referenceSelect'
+            ? options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))
+            : options.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
         </select>
       ) : type === 'textarea' ? (
         <textarea

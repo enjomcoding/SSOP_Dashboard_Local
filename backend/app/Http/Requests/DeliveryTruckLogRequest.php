@@ -17,7 +17,7 @@ class DeliveryTruckLogRequest extends FormRequest
         return [
             'truck_plate_no' => ['required', 'string', 'max:20'],
             'driver_name' => ['required', 'string', 'max:100'],
-            'checked_by' => ['required', 'string', 'max:100'],
+            'checked_by_name' => ['required', 'string', 'max:255'],
             'inspection_date' => ['required', 'date'],
             'inspection_time' => ['required', 'date_format:H:i:s'],
             'exterior_condition' => ['required', Rule::in(['CLEAN', 'DIRTY'])],
@@ -26,7 +26,6 @@ class DeliveryTruckLogRequest extends FormRequest
             'pest_activity' => ['sometimes', 'boolean'],
             'sanitized' => ['sometimes', 'boolean'],
             'maintenance_issues' => ['sometimes', 'boolean'],
-            'inspector_initials' => ['required', 'string', 'max:10'],
             'corrective_action' => ['nullable', 'string'],
         ];
     }
@@ -36,5 +35,6 @@ class DeliveryTruckLogRequest extends FormRequest
         if ($this->has('inspection_time') && preg_match('/^\d{2}:\d{2}$/', $this->inspection_time)) {
             $this->merge(['inspection_time' => $this->inspection_time . ':00']);
         }
+
     }
 }

@@ -1,6 +1,6 @@
-# Food Safety & Quality Assurance Monitoring Dashboard
+# Ilocos Food Products — Sanitation Standard Operating Procedures (SSOP)
 
-Full-stack monitoring dashboard with a Laravel API backend and React frontend.
+Full-stack SSOP dashboard for **Ilocos Food Products** (Taleb, Bantay, Ilocos Sur) with a Laravel API backend and React frontend. Log tables are normalized to **3NF** with reference tables for users, suppliers, and products.
 
 ## Project Structure
 
@@ -8,7 +8,7 @@ Full-stack monitoring dashboard with a Laravel API backend and React frontend.
 Dashboard/
 ├── backend/          # Laravel API (Laravel 9 — PHP 8.2 compatible)
 ├── frontend/         # React + Vite + Tailwind
-├── monitoring_db.sql # MySQL schema + seed reference
+├── monitoring_db.sql # MySQL 3NF schema + seed reference
 └── README.md
 ```
 
@@ -72,11 +72,37 @@ php artisan migrate:fresh --seed
 php artisan serve
 ```
 
-### API Routes
+## 3NF Schema
+
+### Reference tables
+
+| Table | Columns | Purpose |
+|-------|---------|---------|
+| `users` | `id`, `full_name`, `initials`, `role` | QC inspectors, operators, QA staff |
+| `suppliers` | `id`, `name`, `contact_info` | Raw material suppliers |
+| `products` | `id`, `name`, `category` | Finished goods for stock logs |
+
+### Log tables (foreign keys)
+
+| Table | FK columns |
+|-------|------------|
+| `raw_material_logs` | `supplier_id`, `qc_inspector_id`, `received_by_id` |
+| `delivery_truck_logs` | `checked_by_id` (driver name stays as text) |
+| `pest_control_logs` | `inspector_id`, `verified_by_qa_id` (nullable) |
+| `oil_temperature_logs` | `operator_id`, `verified_by_qa_id` (nullable) |
+| `cleaning_logs` | `performed_by_id`, `checked_by_id` (nullable) |
+| `stock_management_logs` | `checked_by_id`, `product_id` |
+
+`inspector_initials` and duplicate name VARCHAR columns were removed; initials live on `users.initials`.
+
+## API Routes
 
 | Method | Endpoint |
 |--------|----------|
 | GET | `/api/analytics` |
+| GET | `/api/users` |
+| GET | `/api/suppliers` |
+| GET | `/api/products` |
 | apiResource | `/api/raw-material-logs` |
 | apiResource | `/api/delivery-truck-logs` |
 | apiResource | `/api/pest-control-logs` |
@@ -84,13 +110,14 @@ php artisan serve
 | apiResource | `/api/cleaning-logs` |
 | apiResource | `/api/stock-management-logs` |
 
-Each resource supports: `GET` (paginated 15/page), `POST`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}`.
+Each log resource supports: `GET` (paginated 15/page, eager-loaded relations), `POST`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}`.
 
 Verify routes:
 
 ```bash
 php artisan route:list --path=api
 curl http://localhost:8000/api/analytics
+curl http://localhost:8000/api/users
 ```
 
 ## Frontend Setup
@@ -112,6 +139,8 @@ Production build:
 npm run build
 ```
 
+Forms use dropdowns (`*_id`) populated from reference endpoints via `useReferenceData()`.
+
 ## Monitoring Tables
 
 | Table | Model | Controller | React Page |
@@ -125,9 +154,27 @@ npm run build
 
 Home analytics: `src/pages/DashboardOverview.jsx`
 
+## Seeding
+
+`php artisan migrate:fresh --seed` runs `MonitoringSeeder` via factories:
+
+| Table | Count |
+|-------|-------|
+| `users` | 10 (mixed roles: QA, QC_INSPECTOR, OPERATOR, WAREHOUSE, PEST_INSPECTOR) |
+| `suppliers` | 10 |
+| `products` | 20 |
+| Each log table | 50 |
+
+**Total:** 340 rows minimum. Factories live in `backend/database/factories/`.
+
+## API performance
+
+- Log `index` / `show` use `HandlesMonitoringCrud` with `RELATIONS` eager loads and `paginate(15)` (no N+1 on list/detail).
+- `AnalyticsController` uses aggregate queries and grouped date counts instead of per-day loops.
+
 ## Notes
 
 - **Laravel version**: Environment has PHP &lt; 8.3, so Laravel 9 was installed instead of Laravel 11. API structure matches Laravel 11 conventions (`routes/api.php`, resource controllers, form requests).
+- **Users table**: Simplified for SSOP reference data (no email/password); not used for authentication in this dashboard.
 - CORS allows `http://localhost:5173` and `http://127.0.0.1:5173`.
-- Seed data is in `MonitoringSeeder` and mirrored in `monitoring_db.sql`.
-- API payloads use snake_case; React hooks/services pass snake_case to the API.
+- API payloads use snake_case; React hooks/services pass snake_case `*_id` fields to the API.

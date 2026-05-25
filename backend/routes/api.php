@@ -5,11 +5,18 @@ use App\Http\Controllers\Api\CleaningLogController;
 use App\Http\Controllers\Api\DeliveryTruckLogController;
 use App\Http\Controllers\Api\OilTemperatureLogController;
 use App\Http\Controllers\Api\PestControlLogController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RawMaterialLogController;
 use App\Http\Controllers\Api\StockManagementLogController;
+use App\Http\Controllers\Api\SupplierController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/analytics', [AnalyticsController::class, 'index']);
+
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/suppliers', [SupplierController::class, 'index']);
+Route::get('/products', [ProductController::class, 'index']);
 
 Route::apiResource('raw-material-logs', RawMaterialLogController::class);
 Route::apiResource('delivery-truck-logs', DeliveryTruckLogController::class);

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import DataTable from '../components/DataTable';
 import FormInput from '../components/FormInput';
@@ -8,12 +8,17 @@ import TableSkeleton from '../components/TableSkeleton';
 import TopHeader from '../components/TopHeader';
 import { resourceColumns, resourceFields, resourceMeta } from '../config/resourceFields';
 import { useFetchLogs } from '../hooks/useFetchLogs';
+import { useReferenceData } from '../hooks/useReferenceData';
 import { useSubmitLog } from '../hooks/useSubmitLog';
 
 const emptyForm = (fields) =>
   fields.reduce((acc, field) => {
     if (field.type === 'checkbox') {
-      acc[field.name] = field.name === 'within_specs' || field.name === 'standard_met' || field.name === 'sanitized' || field.name === 'fifo_fefo_followed';
+      acc[field.name] =
+        field.name === 'within_specs' ||
+        field.name === 'standard_met' ||
+        field.name === 'sanitized' ||
+        field.name === 'fifo_fefo_followed';
     } else if (field.type === 'number') {
       acc[field.name] = '';
     } else {
@@ -25,6 +30,9 @@ const emptyForm = (fields) =>
 const formatForInput = (field, value) => {
   if (field.type === 'checkbox') {
     return value === true || value === 1 || value === '1';
+  }
+  if (field.type === 'referenceSelect') {
+    return value != null && value !== '' ? String(value) : '';
   }
   if (!value && value !== 0) return field.type === 'checkbox' ? false : '';
   if (field.type === 'time') {
@@ -40,6 +48,8 @@ const buildPayload = (fields, form) => {
   const payload = { ...form };
   fields.forEach((field) => {
     if (field.type === 'number' && payload[field.name] !== '') {
+      payload[field.name] = Number(payload[field.name]);
+    } else if (field.type === 'referenceSelect' && payload[field.name] !== '') {
       payload[field.name] = Number(payload[field.name]);
     } else if (field.type === 'checkbox') {
       payload[field.name] = Boolean(payload[field.name]);
@@ -61,15 +71,18 @@ export default function MonitoringPage({ resourceKey }) {
   const [form, setForm] = useState(emptyForm(fields));
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const { data, loading, reload } = useFetchLogs(resourceKey, page);
+  const { optionsFor, loading: referencesLoading } = useReferenceData();
+  const { records, pagination, loading, reload } = useFetchLogs(resourceKey, page);
+
+  useEffect(() => {
+    setPage(1);
+  }, [resourceKey]);
   const { save, remove, submitting } = useSubmitLog(resourceKey, () => {
     setModalOpen(false);
     setEditing(null);
     setForm(emptyForm(fields));
     reload();
   });
-
-  const records = data?.data ?? [];
 
   const openCreate = () => {
     setEditing(null);
@@ -128,7 +141,7 @@ export default function MonitoringPage({ resourceKey }) {
     <>
       <TopHeader
         title={meta.title}
-        subtitle="Manage monitoring records with full CRUD operations"
+        subtitle="Sanitation Standard Operating Procedures"
         action={headerAction}
       />
 
@@ -138,7 +151,7 @@ export default function MonitoringPage({ resourceKey }) {
         <DataTable columns={columns} data={records} onEdit={openEdit} onDelete={setDeleteTarget} />
       )}
 
-      <PaginationControls pagination={data} onPageChange={setPage} />
+      <PaginationControls pagination={pagination} onPageChange={setPage} />
 
       <Modal
         isOpen={modalOpen}
@@ -156,7 +169,7 @@ export default function MonitoringPage({ resourceKey }) {
             <button
               type="submit"
               form="monitoring-form"
-              disabled={submitting}
+              disabled={submitting || referencesLoading}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               {submitting ? 'Saving...' : 'Save'}
@@ -174,7 +187,9 @@ export default function MonitoringPage({ resourceKey }) {
               value={form[field.name]}
               onChange={handleChange}
               required={field.required}
-              options={field.options}
+              options={
+                field.type === 'referenceSelect' ? optionsFor(field.referenceKey) : field.options
+              }
             />
           ))}
         </form>

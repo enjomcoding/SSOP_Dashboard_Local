@@ -2,39 +2,48 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition()
+    protected $model = User::class;
+
+    private const ROLES = [
+        'QA',
+        'QC_INSPECTOR',
+        'OPERATOR',
+        'WAREHOUSE',
+        'PEST_INSPECTOR',
+        'SUPERVISOR',
+    ];
+
+    public function definition(): array
     {
+        $fullName = fake()->name();
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'remember_token' => Str::random(10),
+            'full_name' => $fullName,
+            'initials' => $this->initialsFromName($fullName),
+            'role' => fake()->randomElement(self::ROLES),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return static
-     */
-    public function unverified()
+    public function role(string $role): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(fn () => ['role' => $role]);
+    }
+
+    private function initialsFromName(string $fullName): string
+    {
+        $parts = preg_split('/\s+/', trim($fullName)) ?: [];
+        if (count($parts) >= 2) {
+            return strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts) - 1], 0, 1));
+        }
+
+        return strtoupper(substr($parts[0] ?? 'U', 0, 2));
     }
 }
